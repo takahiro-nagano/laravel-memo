@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Memo;
 
 class HomeController extends Controller
 {
@@ -23,6 +24,56 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $memos = Memo::select('memos.*')
+          ->where('user_id', '=', \Auth::id())
+          ->whereNull('deleted_at')
+          ->orderBy('updated_at', 'DESC')// ASC＝小さい順、DESC=大きい順
+          ->get();
+
+        return view('create', compact('memos'));
     }
+
+    public function store(Request $request)
+    {
+        $posts = $request->all();
+        // dump dieの略 → メソッドの引数の取った値を展開して止める
+        // dd($request);
+
+        Memo::insert(['content' => $posts['content'], 'user_id' => \Auth::id()]);
+
+        return redirect( route('home') );
+    }
+
+    public function edit($id)
+    {
+        $memos = Memo::select('memos.*')
+            ->where('user_id', '=', \Auth::id())
+            ->whereNull('deleted_at')
+            ->orderBy('updated_at', 'DESC')
+            ->get();
+
+        $edit_memo = Memo::find($id);
+
+        return view('edit', compact('memos', 'edit_memo'));
+    }
+
+    public function update(Request $request)
+    {
+        $posts = $request->all();
+
+        Memo::where('id', $posts['memo_id'])->update(['content' => $posts['content']]);
+
+        return redirect( route('home') );
+    }
+
+    public function destory(Request $request)
+    {
+        $posts = $request->all();
+
+        // Memo::where('id', $posts['memo_id'])->delete();←これやると物理削除
+        Memo::where('id', $posts['memo_id'])->update(['deleted_at' => date("Y-m-d H:i:s", time())]);
+
+        return redirect( route('home') );
+    }
+
 }

@@ -76,11 +76,27 @@
         </nav>
 
         {{-- 3カラムに変更 --}}
-        <main class="py-4">
+        <main class="">
             <div class="row">
-                <div class="col-md-2">左カラム</div>
-                <div class="col-md-4">中央カラム</div>
-                <div class="col-md-6">
+                <div class="col-md-2 p-0">
+                    <div class="card">
+                        <div class="card-header">左カラム</div>
+                        <div class="card-body">
+                          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 p-0">
+                    <div class="card">
+                        <div class="card-header">メモ一覧</div>
+                        <div class="card-body">
+                    @foreach($memos as $memo)
+                          <a href="/edit/{{$memo['id']}}" class="card-text d-block">{{ $memo['content'] }}</a>
+                    @endforeach
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 p-0">
                     右カラム
                     @yield('content')
                 </div>
